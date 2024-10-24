@@ -16,17 +16,17 @@ const App = () => {
     try {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
           "recaptcha-container",
           {
             size: "invisible",
             callback: (response) => {
-              onSignup();
+              onSignup;
             },
             "expired-callback": () => {
-              toast.error("Recaptcha expired. Please try again.");
+              toast.error("unsuccessful");
             },
-          },
-          auth
+          }
         );
       }
     } catch (error) {
