@@ -21,7 +21,7 @@ const App = () => {
           {
             size: "invisible",
             callback: (response) => {
-              onSignup;
+              onSignup();
             },
             "expired-callback": () => {
               toast.error("unsuccessful");
@@ -34,28 +34,27 @@ const App = () => {
       toast.error("Failed to initialize recaptcha. Please try again.");
     }
   };
-  const onSignup = async () => {
-    try {
-      setLoading(true);
-      verifyCaptcha();
-      const appVerifier = window.recaptchaVerifier;
-      const formattedPhone = "+" + phone;
+  function onSignup(e) {
+    e.preventDefault();
+    setLoading(true);
+    verifyCaptcha();
 
-      const confirmationResult = await signInWithPhoneNumber(
-        auth,
-        formattedPhone,
-        appVerifier
-      );
-      window.confirmationResult = confirmationResult;
-      setLoading(false);
-      setShowOtp(true);
-      toast.success("OTP Successfully Sent");
-    } catch (error) {
-      console.error("Error during phone number sign-in: ", error);
-      setLoading(false);
-      toast.error("Failed to send OTP. Please try again.");
-    }
-  };
+    const appVerifier = window.recaptchaVerifier;
+
+    const formatPh = "+" + phone;
+
+    signInWithPhoneNumber(auth, formatPh, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        setLoading(false);
+        setShowOtp(true);
+        toast.success("OTP sended successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  }
   const onOTPVerify = () => {
     setLoading(true);
     window.confirmationResult
@@ -67,6 +66,7 @@ const App = () => {
       })
       .catch((err) => {
         console.log(err);
+        toast.error("OTP is Wrong");
         setLoading(false);
       });
   };
@@ -75,8 +75,10 @@ const App = () => {
       <div id="recaptcha-container"></div>
       <Toaster toastOptions={{ duration: 4000 }} />
       {user ? (
-        <h1 className="text center leading-normal text-white font-medium text-3xl mb-6">
-          RESET PASSWORD PAGE
+        <h1 className="text-center leading-normal text-white font-medium text-3xl mb-6">
+          RESET PASSWORD PAGE{""}
+          <br />
+          {`Loggged with ${JSON.stringify(user.phoneNumber)}`}
         </h1>
       ) : (
         <div>
